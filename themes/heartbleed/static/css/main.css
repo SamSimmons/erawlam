@@ -1,0 +1,50 @@
+:root {
+  --main: #FFABA7;
+  --light: #FFE9E8;
+  --dark: #5A576A;
+  --header-font: 'Catamaran';
+  --body-font: 'Work Sans';
+}
+
+body {
+  background: var(--light);
+  color: var(--dark);
+  font-family: var(--body-font);
+  margin: 0;
+  padding: 0;
+}
+
+.block-header {
+  background: var(--main);
+  display: flex;
+  justify-content: space-between;
+  margin: 30px 20px 0;
+  min-height: 270px;
+  padding: 20px 30px;
+}
+
+.block-header h1 {
+  font-size: 2rem;
+  font-weight: 300;
+  margin: 0;
+}
+
+nav {
+  display: flex;
+}
+
+.nav-item {
+  margin: 10px;
+}
+
+.page-wrapper {
+  background: #fff;
+  margin: 0 20px;
+  min-height: calc(100vh - 500px);
+  padding: 20px 30px;
+}
+
+a {
+  color: var(--dark);
+  text-decoration: none;
+}

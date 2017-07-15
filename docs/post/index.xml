@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on erawlam</title>
+    <link>http://erawlam.fun/post/</link>
+    <description>Recent content in Posts on erawlam</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 15 Jul 2017 16:25:33 +1200</lastBuildDate>
+    <atom:link href="http://erawlam.fun/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>third</title>
+      <link>http://erawlam.fun/post/third/</link>
+      <pubDate>Sat, 15 Jul 2017 16:25:33 +1200</pubDate>
+      
+      <guid>http://erawlam.fun/post/third/</guid>
+      <description>&lt;p&gt;Also there&amp;rsquo;s a third post.&lt;/p&gt;
+
+&lt;p&gt;But it&amp;rsquo;s not as good.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>second</title>
+      <link>http://erawlam.fun/post/second/</link>
+      <pubDate>Sat, 15 Jul 2017 16:25:28 +1200</pubDate>
+      
+      <guid>http://erawlam.fun/post/second/</guid>
+      <description>
+
+&lt;p&gt;wooooaaah this is a second post&lt;/p&gt;
+
+&lt;h4 id=&#34;two-wut:9f7936f9b5c071ae81db818b80a44a0d&#34;&gt;two wut&lt;/h4&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>hello world</title>
+      <link>http://erawlam.fun/post/hello-world/</link>
+      <pubDate>Sat, 15 Jul 2017 11:50:22 +1200</pubDate>
+      
+      <guid>http://erawlam.fun/post/hello-world/</guid>
+      <description>&lt;p&gt;HEY GUYS&lt;/p&gt;
+
+&lt;p&gt;this is the first post&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SQL injection - part two</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link href="https://fonts.googleapis.com/css?family=Catamaran:400,700,900|Work+Sans:300,400,500,700" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+  <nav>
+  <a href="/">HOME</a>
+</nav>
+
+  <div class="post">
+    <div class="post__title">
+      <h1>SQL injection - part two</h1>
+      <div class="sub-header">October 20, 2017</div>
+    </div>
+    <div class="post__body">
+      
+
+<p>This is continuation of the series on SQL injection. In part one we covered what SQL injection is, some examples of what can happen when someone leaves their site open to SQLI, and a quick and dirty test to pick up some low hanging fruit.
+In this post we&rsquo;re going to go a bit further into how one would actually exploit a SQL vulnerability, how to figure out what type of database you&rsquo;re working with, and how to us the union operator to extract data, and walkthrough a practical example by testing out new found knowledge against an intentionally vulnerable app.</p>
+
+<h4 id="fingerprinting-the-database:213629b7ae959972348ae4a1f1727fca">Fingerprinting the Database</h4>
+
+<p>There are two main distinctions of databases, there are SQL db&rsquo;s and there are NoSQL dbs&rsquo;s. The difference being surprisingly enough their use of the SQL language. Since we&rsquo;re learning about SQL injection we&rsquo;re only going to concentrate on the ones using SQL. The fundamentals of injection are often the same across different types of SQL based db&rsquo;s, but there are little differences just to make things harder. We&rsquo;re only going to concentrate on three common databases, MySql, Microsoft SQL Server, and Oracle.</p>
+
+<p>You might simply be able to grab the banner by replacing the query to be evaluated with one of the following:</p>
+
+<ul>
+<li><p>MS SQL: <code>SELECT @@version</code></p></li>
+
+<li><p>MySQL: <code>SELECT version()</code></p></li>
+
+<li><p>Oracle: <code>SELECT version FROM v$instance</code></p></li>
+</ul>
+
+<p>You can also try using string concatenation to rule out db&rsquo;s, they handle the following ways of sticking strings together:</p>
+
+<ul>
+<li><p>MS SQL: <code>'a' + 'a'</code></p></li>
+
+<li><p>MySQL: <code>CONCAT('a','a')</code></p></li>
+
+<li><p>Oracle: <code>'a' || 'a' or CONCAT('a', 'a')</code></p></li>
+</ul>
+
+<p>So if you have a vulnerabilty expecting a user id, you can feed it something like <code>1' AND 'aa' = 'a'+ 'a' --</code>, if you get an error you&rsquo;ll know <code>1' AND 'aa'=CONCAT('a','a') --</code></p>
+
+<h4 id="the-union-operator:213629b7ae959972348ae4a1f1727fca">The union operator</h4>
+
+<p>walkthrough of a union attack against dvwa</p>
+
+    </div>
+  </div>
+</body>
+</html>

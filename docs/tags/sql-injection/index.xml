@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>erawlam</title>
-    <link>http://erawlam.fun/</link>
-    <description>Recent content on erawlam</description>
+    <title>Sql Injection on erawlam</title>
+    <link>http://erawlam.fun/tags/sql-injection/</link>
+    <description>Recent content in Sql Injection on erawlam</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 20 Oct 2017 11:19:55 +1300</lastBuildDate>
-    <atom:link href="http://erawlam.fun/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://erawlam.fun/tags/sql-injection/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>SQL injection - part two</title>
@@ -77,20 +77,6 @@ SELECT * FROM shows WHERE title = &amp;ldquo; or 1=1
 Which will check the db for every tv show where the title is &amp;ldquo; (which would return nothing) or 1 = 1 (which is always true). So would send back every single show. Which isn&amp;rsquo;t really great.&lt;/p&gt;
 
 &lt;p&gt;Anyway that&amp;rsquo;s a quick introduction to SQL injection, in part two we&amp;rsquo;re going to cover how to grab data from other tables with the union operator and run through some practical examples (legally, of course).&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>about</title>
-      <link>http://erawlam.fun/about/</link>
-      <pubDate>Sat, 15 Jul 2017 16:56:58 +1200</pubDate>
-      
-      <guid>http://erawlam.fun/about/</guid>
-      <description>&lt;p&gt;This blog is meant to be a beginners guide to some basic information security things, except it&amp;rsquo;s being written by a beginner. Mostly it&amp;rsquo;s just a spot for me to reinforce my learning as I stuff infosec things inside my brain.&lt;/p&gt;
-
-&lt;p&gt;I&amp;rsquo;m a front end developer who&amp;rsquo;s become really interested in the other side of the fence, where everyone where&amp;rsquo;s black hoodies and&lt;/p&gt;
-
-&lt;p&gt;I&amp;rsquo;m aiming to write  a couple of posts a month on whatever topic I&amp;rsquo;m focusing on studying at the time.&lt;/p&gt;
 </description>
     </item>
     

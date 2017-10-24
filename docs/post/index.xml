@@ -6,44 +6,77 @@
     <description>Recent content in Posts on erawlam</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 15 Jul 2017 16:25:33 +1200</lastBuildDate>
+    <lastBuildDate>Fri, 20 Oct 2017 11:19:55 +1300</lastBuildDate>
     <atom:link href="http://erawlam.fun/post/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>third</title>
-      <link>http://erawlam.fun/post/third/</link>
-      <pubDate>Sat, 15 Jul 2017 16:25:33 +1200</pubDate>
+      <title>SQL injection - part two</title>
+      <link>http://erawlam.fun/post/sqli-part-two/</link>
+      <pubDate>Fri, 20 Oct 2017 11:19:55 +1300</pubDate>
       
-      <guid>http://erawlam.fun/post/third/</guid>
-      <description>&lt;p&gt;Also there&amp;rsquo;s a third post.&lt;/p&gt;
-
-&lt;p&gt;But it&amp;rsquo;s not as good.&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>second</title>
-      <link>http://erawlam.fun/post/second/</link>
-      <pubDate>Sat, 15 Jul 2017 16:25:28 +1200</pubDate>
-      
-      <guid>http://erawlam.fun/post/second/</guid>
+      <guid>http://erawlam.fun/post/sqli-part-two/</guid>
       <description>
 
-&lt;p&gt;wooooaaah this is a second post&lt;/p&gt;
+&lt;p&gt;This is continuation of the series on SQL injection. In part one we covered what SQL injection is, some examples of what can happen when someone leaves their site open to SQLI, and a quick and dirty test to pick up some low hanging fruit.
+In this post we&amp;rsquo;re going to go a bit further into how one would actually exploit a SQL vulnerability, how to figure out what type of database you&amp;rsquo;re working with, and how to us the union operator to extract data, and walkthrough a practical example by testing out new found knowledge against an intentionally vulnerable app.&lt;/p&gt;
 
-&lt;h4 id=&#34;two-wut:9f7936f9b5c071ae81db818b80a44a0d&#34;&gt;two wut&lt;/h4&gt;
+&lt;h4 id=&#34;fingerprinting-the-database:213629b7ae959972348ae4a1f1727fca&#34;&gt;Fingerprinting the Database&lt;/h4&gt;
+
+&lt;p&gt;There are two main distinctions of databases, there are SQL db&amp;rsquo;s and there are NoSQL dbs&amp;rsquo;s. The difference being surprisingly enough their use of the SQL language. Since we&amp;rsquo;re learning about SQL injection we&amp;rsquo;re only going to concentrate on the ones using SQL. The fundamentals of injection are often the same across different types of SQL based db&amp;rsquo;s, but there are little differences just to make things harder. We&amp;rsquo;re only going to concentrate on three common databases, MySql, Microsoft SQL Server, and Oracle.&lt;/p&gt;
+
+&lt;p&gt;You might simply be able to grab the banner by replacing the query to be evaluated with one of the following:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;MS SQL: &lt;code&gt;SELECT @@version&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;MySQL: &lt;code&gt;SELECT version()&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Oracle: &lt;code&gt;SELECT version FROM v$instance&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;You can also try using string concatenation to rule out db&amp;rsquo;s, they handle the following ways of sticking strings together:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;MS SQL: &lt;code&gt;&#39;a&#39; + &#39;a&#39;&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;MySQL: &lt;code&gt;CONCAT(&#39;a&#39;,&#39;a&#39;)&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Oracle: &lt;code&gt;&#39;a&#39; || &#39;a&#39; or CONCAT(&#39;a&#39;, &#39;a&#39;)&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;So if you have a vulnerabilty expecting a user id, you can feed it something like &lt;code&gt;1&#39; AND &#39;aa&#39; = &#39;a&#39;+ &#39;a&#39; --&lt;/code&gt;, if you get an error you&amp;rsquo;ll know &lt;code&gt;1&#39; AND &#39;aa&#39;=CONCAT(&#39;a&#39;,&#39;a&#39;) --&lt;/code&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;the-union-operator:213629b7ae959972348ae4a1f1727fca&#34;&gt;The union operator&lt;/h4&gt;
+
+&lt;p&gt;walkthrough of a union attack against dvwa&lt;/p&gt;
 </description>
     </item>
     
     <item>
-      <title>hello world</title>
-      <link>http://erawlam.fun/post/hello-world/</link>
-      <pubDate>Sat, 15 Jul 2017 11:50:22 +1200</pubDate>
+      <title>Sql injection - part one</title>
+      <link>http://erawlam.fun/post/sqli-part-one/</link>
+      <pubDate>Thu, 19 Oct 2017 11:50:22 +1200</pubDate>
       
-      <guid>http://erawlam.fun/post/hello-world/</guid>
-      <description>&lt;p&gt;HEY GUYS&lt;/p&gt;
+      <guid>http://erawlam.fun/post/sqli-part-one/</guid>
+      <description>&lt;p&gt;Web apps have all kinds of good stuff that an attacker could want. Personal information, usernames, passwords, credit card information. Because there is lots and lots of this good stuff, web apps need some way to keep it all organized and accessable. The most common kind of data store is some form of sql database.&lt;/p&gt;
 
-&lt;p&gt;this is the first post&lt;/p&gt;
+&lt;p&gt;SQL is a language used to to talk to the database. If the web application want&amp;rsquo;s to change something it will be translated into SQL and used to update the database. Let&amp;rsquo;s say you have a web app &lt;code&gt;badNetflix&lt;/code&gt; which allows users to search for tv shows. A user comes on and wants to find a hilarious show about a horse in hollywood. They type &amp;lsquo;Bojack Horseman&amp;rsquo; in the searchbar and hit enter. A request goes up to the server with the string &amp;lsquo;Bojack Horseman&amp;rsquo; and the server goes to the database and forms a query like:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;SELECT * FROM shows WHERE WHERE title = &#39;Bojack Horseman&#39;;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Everything works fine, they binge watch all seasons of Bojack back to back since it&amp;rsquo;s a great show. They lose their job and become an alcoholic and decide to spend their days watching other tv shows. They decide to watch It&amp;rsquo;s Always Sunny in Philadelphia and they&amp;rsquo;re passionate about using apostrophes, so they search for that next, the web app sends it up to the server and oh shit everything breaks. The server creates the query:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;SELECT * FROM shows WHERE WHERE title = &#39;It&#39;s Always Sunny in Philadelphia&#39;;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;See the problem? The single quote in &amp;ldquo;It&amp;rsquo;s&amp;rdquo; closes the string, which is invalid syntax. Now our user is an alcoholic tv junkie with nothing but time on their hands and a need to make money somehow to pay for their badNetflix bill. This is terrible. Because the developer made some mistakes not securing the site, our attacker can have a field day. They could steal data or credentials. Maybe just drop the table for fun, in some cases SQL injection can lead to an attacker being able to control the entire server.&lt;/p&gt;
+
+&lt;p&gt;A common way to test for sql injection is just to start chucking in single quotes willy nilly into input fields and url bars and see what breaks.  If you get back something funny then it&amp;rsquo;s worth investigatinf further. With the badNetflix example, if our degenerate TV aficianado was to input &lt;code&gt;&#39; or 1 = 1 --&lt;/code&gt; instead of a title, our code would naively send back all the information in the shows database. The &lt;code&gt;--&lt;/code&gt; starts a comment, so will just blank out anything coming after, so the server will create the query:
+SELECT * FROM shows WHERE title = &amp;ldquo; or 1=1
+Which will check the db for every tv show where the title is &amp;ldquo; (which would return nothing) or 1 = 1 (which is always true). So would send back every single show. Which isn&amp;rsquo;t really great.&lt;/p&gt;
+
+&lt;p&gt;Anyway that&amp;rsquo;s a quick introduction to SQL injection, in part two we&amp;rsquo;re going to cover how to grab data from other tables with the union operator and run through some practical examples (legally, of course).&lt;/p&gt;
 </description>
     </item>
     

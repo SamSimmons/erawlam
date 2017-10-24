@@ -2,6 +2,7 @@
   --main: #FFABA7;
   --light: #FFE9E8;
   --dark: #5A576A;
+  --faded: rgba(100, 100, 100, .1);
   --header-font: 'Catamaran';
   --body-font: 'Work Sans';
 }
@@ -29,13 +30,8 @@ body {
   margin: 0;
 }
 
-nav {
-  display: flex;
-}
-
-.nav-item {
-  margin: 10px;
-}
+nav { display: flex; }
+.nav-item { margin: 10px; }
 
 .page-wrapper {
   background: #fff;
@@ -47,4 +43,32 @@ nav {
 a {
   color: var(--dark);
   text-decoration: none;
+}
+
+code {
+  background: rgba(205, 205, 205, .5);
+  border-radius: 1px;
+  padding: 3px;
+}
+
+.post__body {
+  max-width: 700px;
+}
+
+.post {
+  padding: 20px;
+}
+
+.post p {
+  line-height: 1.35em;
+}
+
+.short-post {
+  border-bottom: 1px solid var(--faded);
+  padding-bottom: 10px;
+  margin: 10px 0 20px;
+}
+
+.short-post__title {
+  font-size: 1.5rem;
 }

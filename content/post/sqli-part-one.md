@@ -1,9 +1,9 @@
 +++
 date = "2017-10-19T11:50:22+12:00"
 draft = false
-Description = "An introduction to SQL injection, an overview of what it is, and what it commonly looks like"
+description = "An introduction to SQL injection, an overview of what it is, and what it commonly looks like"
 title = "Sql injection - part one"
-Tags = ["SQL injection"]
+tags = ["SQL injection"]
 
 +++
 

@@ -24,6 +24,16 @@ In this post we&amp;rsquo;re going to go a bit further into how one would actual
 
 &lt;p&gt;There are two main distinctions of databases, there are SQL db&amp;rsquo;s and there are NoSQL dbs&amp;rsquo;s. The difference being surprisingly enough their use of the SQL language. Since we&amp;rsquo;re learning about SQL injection we&amp;rsquo;re only going to concentrate on the ones using SQL. The fundamentals of injection are often the same across different types of SQL based db&amp;rsquo;s, but there are little differences just to make things harder. We&amp;rsquo;re only going to concentrate on three common databases, MySql, Microsoft SQL Server, and Oracle.&lt;/p&gt;
 
+&lt;p&gt;There are a few different ways of figuring out the type of database you&amp;rsquo;re up against, you might be able to tell from the error message printed when providing bad input.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;MS SQL: &lt;code&gt;Microsoft SQL Native Client error ‘80040e14’ Unclosed quotation mark after the character string&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;MySQL: &lt;code&gt;You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near &#39;&#39;&#39;&#39;&#39; at line 1&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Oracle: &lt;code&gt;ORA-00933: SQL command not properly ended&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
 &lt;p&gt;You might simply be able to grab the banner by replacing the query to be evaluated with one of the following:&lt;/p&gt;
 
 &lt;ul&gt;
@@ -34,21 +44,55 @@ In this post we&amp;rsquo;re going to go a bit further into how one would actual
 &lt;li&gt;&lt;p&gt;Oracle: &lt;code&gt;SELECT version FROM v$instance&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;You can also try using string concatenation to rule out db&amp;rsquo;s, they handle the following ways of sticking strings together:&lt;/p&gt;
+&lt;p&gt;You can also use math functions to check, as the functions listed will only work on those databases:&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;p&gt;MS SQL: &lt;code&gt;&#39;a&#39; + &#39;a&#39;&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;MS SQL: &lt;code&gt;SQUARE(1)&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;MySQL: &lt;code&gt;CONCAT(&#39;a&#39;,&#39;a&#39;)&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;MySQL: &lt;code&gt;POW(1,1)&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;Oracle: &lt;code&gt;&#39;a&#39; || &#39;a&#39; or CONCAT(&#39;a&#39;, &#39;a&#39;)&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Oracle: &lt;code&gt;BITAND(1,1)&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;So if you have a vulnerabilty expecting a user id, you can feed it something like &lt;code&gt;1&#39; AND &#39;aa&#39; = &#39;a&#39;+ &#39;a&#39; --&lt;/code&gt;, if you get an error you&amp;rsquo;ll know &lt;code&gt;1&#39; AND &#39;aa&#39;=CONCAT(&#39;a&#39;,&#39;a&#39;) --&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;All those functions evaluate to &lt;code&gt;1&lt;/code&gt; so you can use them in a query like &lt;code&gt;http://fakesite.com/profile?id=2-POW(1,1)&lt;/code&gt; which should error on an oracle or sql server db but gets you the correct page for a MySQL backed site. Once you know what database you&amp;rsquo;re up against you know what syntax to use to investigate further and you&amp;rsquo;ll have a better chance of exploiting the vulnerability further.&lt;/p&gt;
 
 &lt;h4 id=&#34;the-union-operator:213629b7ae959972348ae4a1f1727fca&#34;&gt;The union operator&lt;/h4&gt;
 
-&lt;p&gt;walkthrough of a union attack against dvwa&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;Union&lt;/code&gt; operator is used to mix together two SELECT statements into one set of results, it is one of the most common ways to get arbitary data when you&amp;rsquo;ve got a SQLI vulnerabilty that returns results directly. Using the union operator you can basically tack on a totally seperate nasty query with the one that&amp;rsquo;s already running. In the previous post we used the example of a web app returning tv show information using something like &lt;code&gt;SELECT * FROM shows WHERE title = &#39;Bojack Horseman&#39;;&lt;/code&gt;, we saw how a hacker could twist the query into returning everything in the shows table.&lt;/p&gt;
+
+&lt;p&gt;Getting that extra data probably isn&amp;rsquo;t that interesting to a hacker, they want usernames and passwords. But by using the union operator they might be able to get just that. Entering the input &lt;code&gt;Bojack Horseman&#39; UNION SELECT * FROM users --&lt;/code&gt; would get the hacker all the data from the users table (if there is a table called users). There is one major gotcha to using the union operator, the union query must have the same number of columns as the first query and the column types must match.&lt;/p&gt;
+
+&lt;p&gt;If the shows table has three columns, &lt;code&gt;name&lt;/code&gt;, &lt;code&gt;creator&lt;/code&gt;, &lt;code&gt;star_rating&lt;/code&gt;, and the users table might have &lt;code&gt;name&lt;/code&gt;, &lt;code&gt;password&lt;/code&gt;, &lt;code&gt;date_joined&lt;/code&gt;, &lt;code&gt;email&lt;/code&gt; then our earlier query would fail with an error about matching the number of columns. But you could do something like &lt;code&gt;Bojack Horseman&#39; UNION SELECT name, password, email FROM users --&lt;/code&gt; assuming the types matched.&lt;/p&gt;
+
+&lt;p&gt;There are a few fancy tricks around converting types to make sure they match and figuring out how many columns are in the first table but they&amp;rsquo;re probably out of scope of this post. Let&amp;rsquo;s get into the example.&lt;/p&gt;
+
+&lt;h4 id=&#34;damn-vulnerable-web-app:213629b7ae959972348ae4a1f1727fca&#34;&gt;Damn Vulnerable Web app&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/ethicalhack3r/DVWA&#34;&gt;Damn Vulnerable Web App&lt;/a&gt; (DVWA) is an intentionally vulnerable web application created for people to learn about security in a safe and legal environment. I&amp;rsquo;m not going to go through the process of setting it up, there are pretty good instructions on the github page. But once you&amp;rsquo;ve got it up and running, you want to login with the username &lt;code&gt;admin&lt;/code&gt; and the password &lt;code&gt;password&lt;/code&gt;, you&amp;rsquo;ll likely need to setup/reset the DB (by clicking the button) and in the DVWA Security tab, set the difficulty level to low. Then if you navigate to the SQL injection tab you should see a screen like this:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://erawlam.fun/sqli-two/1.png&#34; alt=&#34;dvwa screenshot&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The way it&amp;rsquo;s supposed to work is by entering a user id in the box and you&amp;rsquo;ll get back some basic information about that user. If we test this input out by entering a &lt;code&gt;&#39;&lt;/code&gt; into the box, we get a error page saying to check our SQL syntax. Cool we know this input is vulnerable to sql injection. Also we know that we&amp;rsquo;re working with a MySQL db since it mentions it in the error message. Helpful.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s try and get it to send back something it shouldn&amp;rsquo;t. How about information for all the users in one query. We can probably guess that the server is doing something like &lt;code&gt;SELECT id, first_name, last_name FROM users WHERE id = &#39;something&#39;&lt;/code&gt;. So if we can feed the server an OR condition that&amp;rsquo;s always true we can probably get everything in the table, try entering &lt;code&gt;&#39; or 1=1 #&lt;/code&gt; which is going to check each row in the table and see if the the id matches &lt;code&gt;&#39;&#39;&lt;/code&gt; (which it won&amp;rsquo;t) or if the number 1 is equal to 1(which it always is) so return all the rows in the table.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://erawlam.fun/sqli-two/2.png&#34; alt=&#34;dvwa screenshot&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Cool, we&amp;rsquo;ve verified that we can trick the server into returning extra information. But we would really love passwords rather than everyones names/ids. We want to use our new union trick, but to do that we need to know a few more things. We want the name of a table likely to hold users logins/passwords and we need to know the columns in this table so we can combine them with our union attack.&lt;/p&gt;
+
+&lt;p&gt;We know we&amp;rsquo;re dealing with a MySQL table, to get a list of all the tables in a MySQL db you can run a query like &lt;code&gt;SELECT table_name FROM information_schema.tables&lt;/code&gt;. If you&amp;rsquo;re up against an oracle or SQL server db then the syntax will be different, something like &lt;code&gt;SELECT table_name FROM all_tables&lt;/code&gt; for oracle and depending on the version of sql server &lt;code&gt;SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE=&#39;BASE TABLE&#39;&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;We can use our query to find the table names with the union query, the only trick is because the first query is expecting an integer as the first argument we&amp;rsquo;ll need to use null in our union so the types won&amp;rsquo;t clash. But using something like &lt;code&gt;&#39; and 1=0 union select null, table_name from information_schema.tables #&lt;/code&gt; we can get the server to send us back all the tables in the database. Using &lt;code&gt;1=0&lt;/code&gt; makes sure we don&amp;rsquo;t get any valid results in the first query, instead it only sends back table names. This is cool, we can see some interesting tables in there amongst lots of fluff. To filter out some of the MySQL specific fluff we could add in a where clause as well like &lt;code&gt;WHERE table_schema != &#39;mysql&#39; AND table_schema != &#39;information_schema&#39;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Anyway you want to look through the table names and find something that might hold interesting data, the &lt;code&gt;users&lt;/code&gt; table immedietly jumps out at me, it&amp;rsquo;s probably got passwords and other sensitive information. Now that we&amp;rsquo;ve got a sql vulnerability open to union attacks and name for the table we want, we can dig a bit further. The next step will be to find column names. We use the same tactic as before, &lt;code&gt;&#39; and 1=0 union SELECT null, COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = &#39;users&#39;; #&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://erawlam.fun/sqli-two/3.png&#34; alt=&#34;dvwa screenshot&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Cool, now we can see some columns we&amp;rsquo;re interested in, &lt;code&gt;user&lt;/code&gt; and &lt;code&gt;password&lt;/code&gt; look particularly promising. Lets&amp;rsquo; grab some login credentials. Again we&amp;rsquo;ll use the same process here, the only problem is we want to grab both the username and password hash and we&amp;rsquo;ve only got one slot to squeeze them in. No problem, we can use the concat function to stick both columns together. &lt;code&gt;&#39; UNION SELECT null, concat(user, &#39;:&#39; ,password) FROM users #&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://erawlam.fun/sqli-two/3.png&#34; alt=&#34;dvwa screenshot&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Cool, we now have usernames and passwords for all the users of the web app. The passwords are hashed though so we cant read them. These passwords happen to hashed using the MD5 algorithm, which can be cracked reasonably easily. If you&amp;rsquo;re interested you can crack them with a program called &lt;code&gt;john the ripper&lt;/code&gt; but I won&amp;rsquo;t cover that here.&lt;/p&gt;
 </description>
     </item>
     
@@ -62,12 +106,12 @@ In this post we&amp;rsquo;re going to go a bit further into how one would actual
 
 &lt;p&gt;SQL is a language used to to talk to the database. If the web application want&amp;rsquo;s to change something it will be translated into SQL and used to update the database. Let&amp;rsquo;s say you have a web app &lt;code&gt;badNetflix&lt;/code&gt; which allows users to search for tv shows. A user comes on and wants to find a hilarious show about a horse in hollywood. They type &amp;lsquo;Bojack Horseman&amp;rsquo; in the searchbar and hit enter. A request goes up to the server with the string &amp;lsquo;Bojack Horseman&amp;rsquo; and the server goes to the database and forms a query like:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;SELECT * FROM shows WHERE WHERE title = &#39;Bojack Horseman&#39;;
+&lt;pre&gt;&lt;code&gt;SELECT * FROM shows WHERE title = &#39;Bojack Horseman&#39;;
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Everything works fine, they binge watch all seasons of Bojack back to back since it&amp;rsquo;s a great show. They lose their job and become an alcoholic and decide to spend their days watching other tv shows. They decide to watch It&amp;rsquo;s Always Sunny in Philadelphia and they&amp;rsquo;re passionate about using apostrophes, so they search for that next, the web app sends it up to the server and oh shit everything breaks. The server creates the query:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;SELECT * FROM shows WHERE WHERE title = &#39;It&#39;s Always Sunny in Philadelphia&#39;;
+&lt;pre&gt;&lt;code&gt;SELECT * FROM shows WHERE title = &#39;It&#39;s Always Sunny in Philadelphia&#39;;
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;See the problem? The single quote in &amp;ldquo;It&amp;rsquo;s&amp;rdquo; closes the string, which is invalid syntax. Now our user is an alcoholic tv junkie with nothing but time on their hands and a need to make money somehow to pay for their badNetflix bill. This is terrible. Because the developer made some mistakes not securing the site, our attacker can have a field day. They could steal data or credentials. Maybe just drop the table for fun, in some cases SQL injection can lead to an attacker being able to control the entire server.&lt;/p&gt;

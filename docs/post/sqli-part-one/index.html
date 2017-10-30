@@ -22,12 +22,12 @@
 
 <p>SQL is a language used to to talk to the database. If the web application want&rsquo;s to change something it will be translated into SQL and used to update the database. Let&rsquo;s say you have a web app <code>badNetflix</code> which allows users to search for tv shows. A user comes on and wants to find a hilarious show about a horse in hollywood. They type &lsquo;Bojack Horseman&rsquo; in the searchbar and hit enter. A request goes up to the server with the string &lsquo;Bojack Horseman&rsquo; and the server goes to the database and forms a query like:</p>
 
-<pre><code>SELECT * FROM shows WHERE WHERE title = 'Bojack Horseman';
+<pre><code>SELECT * FROM shows WHERE title = 'Bojack Horseman';
 </code></pre>
 
 <p>Everything works fine, they binge watch all seasons of Bojack back to back since it&rsquo;s a great show. They lose their job and become an alcoholic and decide to spend their days watching other tv shows. They decide to watch It&rsquo;s Always Sunny in Philadelphia and they&rsquo;re passionate about using apostrophes, so they search for that next, the web app sends it up to the server and oh shit everything breaks. The server creates the query:</p>
 
-<pre><code>SELECT * FROM shows WHERE WHERE title = 'It's Always Sunny in Philadelphia';
+<pre><code>SELECT * FROM shows WHERE title = 'It's Always Sunny in Philadelphia';
 </code></pre>
 
 <p>See the problem? The single quote in &ldquo;It&rsquo;s&rdquo; closes the string, which is invalid syntax. Now our user is an alcoholic tv junkie with nothing but time on their hands and a need to make money somehow to pay for their badNetflix bill. This is terrible. Because the developer made some mistakes not securing the site, our attacker can have a field day. They could steal data or credentials. Maybe just drop the table for fun, in some cases SQL injection can lead to an attacker being able to control the entire server.</p>

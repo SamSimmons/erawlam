@@ -27,6 +27,16 @@ In this post we&rsquo;re going to go a bit further into how one would actually e
 
 <p>There are two main distinctions of databases, there are SQL db&rsquo;s and there are NoSQL dbs&rsquo;s. The difference being surprisingly enough their use of the SQL language. Since we&rsquo;re learning about SQL injection we&rsquo;re only going to concentrate on the ones using SQL. The fundamentals of injection are often the same across different types of SQL based db&rsquo;s, but there are little differences just to make things harder. We&rsquo;re only going to concentrate on three common databases, MySql, Microsoft SQL Server, and Oracle.</p>
 
+<p>There are a few different ways of figuring out the type of database you&rsquo;re up against, you might be able to tell from the error message printed when providing bad input.</p>
+
+<ul>
+<li><p>MS SQL: <code>Microsoft SQL Native Client error ‘80040e14’ Unclosed quotation mark after the character string</code></p></li>
+
+<li><p>MySQL: <code>You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''''' at line 1</code></p></li>
+
+<li><p>Oracle: <code>ORA-00933: SQL command not properly ended</code></p></li>
+</ul>
+
 <p>You might simply be able to grab the banner by replacing the query to be evaluated with one of the following:</p>
 
 <ul>
@@ -37,21 +47,55 @@ In this post we&rsquo;re going to go a bit further into how one would actually e
 <li><p>Oracle: <code>SELECT version FROM v$instance</code></p></li>
 </ul>
 
-<p>You can also try using string concatenation to rule out db&rsquo;s, they handle the following ways of sticking strings together:</p>
+<p>You can also use math functions to check, as the functions listed will only work on those databases:</p>
 
 <ul>
-<li><p>MS SQL: <code>'a' + 'a'</code></p></li>
+<li><p>MS SQL: <code>SQUARE(1)</code></p></li>
 
-<li><p>MySQL: <code>CONCAT('a','a')</code></p></li>
+<li><p>MySQL: <code>POW(1,1)</code></p></li>
 
-<li><p>Oracle: <code>'a' || 'a' or CONCAT('a', 'a')</code></p></li>
+<li><p>Oracle: <code>BITAND(1,1)</code></p></li>
 </ul>
 
-<p>So if you have a vulnerabilty expecting a user id, you can feed it something like <code>1' AND 'aa' = 'a'+ 'a' --</code>, if you get an error you&rsquo;ll know <code>1' AND 'aa'=CONCAT('a','a') --</code></p>
+<p>All those functions evaluate to <code>1</code> so you can use them in a query like <code>http://fakesite.com/profile?id=2-POW(1,1)</code> which should error on an oracle or sql server db but gets you the correct page for a MySQL backed site. Once you know what database you&rsquo;re up against you know what syntax to use to investigate further and you&rsquo;ll have a better chance of exploiting the vulnerability further.</p>
 
 <h4 id="the-union-operator:213629b7ae959972348ae4a1f1727fca">The union operator</h4>
 
-<p>walkthrough of a union attack against dvwa</p>
+<p>The <code>Union</code> operator is used to mix together two SELECT statements into one set of results, it is one of the most common ways to get arbitary data when you&rsquo;ve got a SQLI vulnerabilty that returns results directly. Using the union operator you can basically tack on a totally seperate nasty query with the one that&rsquo;s already running. In the previous post we used the example of a web app returning tv show information using something like <code>SELECT * FROM shows WHERE title = 'Bojack Horseman';</code>, we saw how a hacker could twist the query into returning everything in the shows table.</p>
+
+<p>Getting that extra data probably isn&rsquo;t that interesting to a hacker, they want usernames and passwords. But by using the union operator they might be able to get just that. Entering the input <code>Bojack Horseman' UNION SELECT * FROM users --</code> would get the hacker all the data from the users table (if there is a table called users). There is one major gotcha to using the union operator, the union query must have the same number of columns as the first query and the column types must match.</p>
+
+<p>If the shows table has three columns, <code>name</code>, <code>creator</code>, <code>star_rating</code>, and the users table might have <code>name</code>, <code>password</code>, <code>date_joined</code>, <code>email</code> then our earlier query would fail with an error about matching the number of columns. But you could do something like <code>Bojack Horseman' UNION SELECT name, password, email FROM users --</code> assuming the types matched.</p>
+
+<p>There are a few fancy tricks around converting types to make sure they match and figuring out how many columns are in the first table but they&rsquo;re probably out of scope of this post. Let&rsquo;s get into the example.</p>
+
+<h4 id="damn-vulnerable-web-app:213629b7ae959972348ae4a1f1727fca">Damn Vulnerable Web app</h4>
+
+<p><a href="https://github.com/ethicalhack3r/DVWA">Damn Vulnerable Web App</a> (DVWA) is an intentionally vulnerable web application created for people to learn about security in a safe and legal environment. I&rsquo;m not going to go through the process of setting it up, there are pretty good instructions on the github page. But once you&rsquo;ve got it up and running, you want to login with the username <code>admin</code> and the password <code>password</code>, you&rsquo;ll likely need to setup/reset the DB (by clicking the button) and in the DVWA Security tab, set the difficulty level to low. Then if you navigate to the SQL injection tab you should see a screen like this:</p>
+
+<p><img src="/sqli-two/1.png" alt="dvwa screenshot" /></p>
+
+<p>The way it&rsquo;s supposed to work is by entering a user id in the box and you&rsquo;ll get back some basic information about that user. If we test this input out by entering a <code>'</code> into the box, we get a error page saying to check our SQL syntax. Cool we know this input is vulnerable to sql injection. Also we know that we&rsquo;re working with a MySQL db since it mentions it in the error message. Helpful.</p>
+
+<p>Let&rsquo;s try and get it to send back something it shouldn&rsquo;t. How about information for all the users in one query. We can probably guess that the server is doing something like <code>SELECT id, first_name, last_name FROM users WHERE id = 'something'</code>. So if we can feed the server an OR condition that&rsquo;s always true we can probably get everything in the table, try entering <code>' or 1=1 #</code> which is going to check each row in the table and see if the the id matches <code>''</code> (which it won&rsquo;t) or if the number 1 is equal to 1(which it always is) so return all the rows in the table.</p>
+
+<p><img src="/sqli-two/2.png" alt="dvwa screenshot" /></p>
+
+<p>Cool, we&rsquo;ve verified that we can trick the server into returning extra information. But we would really love passwords rather than everyones names/ids. We want to use our new union trick, but to do that we need to know a few more things. We want the name of a table likely to hold users logins/passwords and we need to know the columns in this table so we can combine them with our union attack.</p>
+
+<p>We know we&rsquo;re dealing with a MySQL table, to get a list of all the tables in a MySQL db you can run a query like <code>SELECT table_name FROM information_schema.tables</code>. If you&rsquo;re up against an oracle or SQL server db then the syntax will be different, something like <code>SELECT table_name FROM all_tables</code> for oracle and depending on the version of sql server <code>SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'</code>.</p>
+
+<p>We can use our query to find the table names with the union query, the only trick is because the first query is expecting an integer as the first argument we&rsquo;ll need to use null in our union so the types won&rsquo;t clash. But using something like <code>' and 1=0 union select null, table_name from information_schema.tables #</code> we can get the server to send us back all the tables in the database. Using <code>1=0</code> makes sure we don&rsquo;t get any valid results in the first query, instead it only sends back table names. This is cool, we can see some interesting tables in there amongst lots of fluff. To filter out some of the MySQL specific fluff we could add in a where clause as well like <code>WHERE table_schema != 'mysql' AND table_schema != 'information_schema'</code></p>
+
+<p>Anyway you want to look through the table names and find something that might hold interesting data, the <code>users</code> table immedietly jumps out at me, it&rsquo;s probably got passwords and other sensitive information. Now that we&rsquo;ve got a sql vulnerability open to union attacks and name for the table we want, we can dig a bit further. The next step will be to find column names. We use the same tactic as before, <code>' and 1=0 union SELECT null, COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'users'; #</code></p>
+
+<p><img src="/sqli-two/3.png" alt="dvwa screenshot" /></p>
+
+<p>Cool, now we can see some columns we&rsquo;re interested in, <code>user</code> and <code>password</code> look particularly promising. Lets&rsquo; grab some login credentials. Again we&rsquo;ll use the same process here, the only problem is we want to grab both the username and password hash and we&rsquo;ve only got one slot to squeeze them in. No problem, we can use the concat function to stick both columns together. <code>' UNION SELECT null, concat(user, ':' ,password) FROM users #</code></p>
+
+<p><img src="/sqli-two/3.png" alt="dvwa screenshot" /></p>
+
+<p>Cool, we now have usernames and passwords for all the users of the web app. The passwords are hashed though so we cant read them. These passwords happen to hashed using the MD5 algorithm, which can be cracked reasonably easily. If you&rsquo;re interested you can crack them with a program called <code>john the ripper</code> but I won&rsquo;t cover that here.</p>
 
     </div>
   </div>

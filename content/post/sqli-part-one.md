@@ -11,11 +11,11 @@ Web apps have all kinds of good stuff that an attacker could want. Personal info
 
 SQL is a language used to to talk to the database. If the web application want's to change something it will be translated into SQL and used to update the database. Let's say you have a web app `badNetflix` which allows users to search for tv shows. A user comes on and wants to find a hilarious show about a horse in hollywood. They type 'Bojack Horseman' in the searchbar and hit enter. A request goes up to the server with the string 'Bojack Horseman' and the server goes to the database and forms a query like:
 ```
-SELECT * FROM shows WHERE WHERE title = 'Bojack Horseman';
+SELECT * FROM shows WHERE title = 'Bojack Horseman';
 ```
 Everything works fine, they binge watch all seasons of Bojack back to back since it's a great show. They lose their job and become an alcoholic and decide to spend their days watching other tv shows. They decide to watch It's Always Sunny in Philadelphia and they're passionate about using apostrophes, so they search for that next, the web app sends it up to the server and oh shit everything breaks. The server creates the query:
 ```
-SELECT * FROM shows WHERE WHERE title = 'It's Always Sunny in Philadelphia';
+SELECT * FROM shows WHERE title = 'It's Always Sunny in Philadelphia';
 ```
 See the problem? The single quote in "It's" closes the string, which is invalid syntax. Now our user is an alcoholic tv junkie with nothing but time on their hands and a need to make money somehow to pay for their badNetflix bill. This is terrible. Because the developer made some mistakes not securing the site, our attacker can have a field day. They could steal data or credentials. Maybe just drop the table for fun, in some cases SQL injection can lead to an attacker being able to control the entire server.
 

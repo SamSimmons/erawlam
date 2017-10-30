@@ -4,21 +4,29 @@
   <title>Sql injection - part one</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link href="https://fonts.googleapis.com/css?family=Catamaran:400,700,900|Work+Sans:300,400,500,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Catamaran:300,400,500,700,900|Cormorant:300" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
+  <div class="header">
+  <div class="header__logo">
+    <a href="/">erawlam</a>
+  </div>
   <nav>
-  <a href="/">HOME</a>
-</nav>
+    <a class="nav-item" href="/">Home.</a>
+    <a class="nav-item" href="/about">About.</a>
+    <a class="nav-item" href="/categories">Categories.</a>
+  </nav>
+</div>
 
-  <div class="post">
-    <div class="post__title">
-      <h1>Sql injection - part one</h1>
-      <div class="sub-header">October 19, 2017</div>
-    </div>
-    <div class="post__body">
-      <p>Web apps have all kinds of good stuff that an attacker could want. Personal information, usernames, passwords, credit card information. Because there is lots and lots of this good stuff, web apps need some way to keep it all organized and accessable. The most common kind of data store is some form of sql database.</p>
+  <div class="page-wrapper">
+    <div class="post">
+      <div class="post__title">
+        <h1>Sql injection - part one</h1>
+        <div class="sub-header">October 19, 2017</div>
+      </div>
+      <div class="post__body">
+        <p>Web apps have all kinds of good stuff that an attacker could want. Personal information, usernames, passwords, credit card information. Because there is lots and lots of this good stuff, web apps need some way to keep it all organized and accessable. The most common kind of data store is some form of sql database.</p>
 
 <p>SQL is a language used to to talk to the database. If the web application want&rsquo;s to change something it will be translated into SQL and used to update the database. Let&rsquo;s say you have a web app <code>badNetflix</code> which allows users to search for tv shows. A user comes on and wants to find a hilarious show about a horse in hollywood. They type &lsquo;Bojack Horseman&rsquo; in the searchbar and hit enter. A request goes up to the server with the string &lsquo;Bojack Horseman&rsquo; and the server goes to the database and forms a query like:</p>
 
@@ -38,7 +46,8 @@ Which will check the db for every tv show where the title is &ldquo; (which woul
 
 <p>Anyway that&rsquo;s a quick introduction to SQL injection, in part two we&rsquo;re going to cover how to grab data from other tables with the union operator and run through some practical examples (legally, of course).</p>
 
-    </div>
+      </div>
+    </div>    
   </div>
 </body>
 </html>

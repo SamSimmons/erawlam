@@ -4,21 +4,29 @@
   <title>SQL injection - part two</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link href="https://fonts.googleapis.com/css?family=Catamaran:400,700,900|Work+Sans:300,400,500,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Catamaran:300,400,500,700,900|Cormorant:300" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
+  <div class="header">
+  <div class="header__logo">
+    <a href="/">erawlam</a>
+  </div>
   <nav>
-  <a href="/">HOME</a>
-</nav>
+    <a class="nav-item" href="/">Home.</a>
+    <a class="nav-item" href="/about">About.</a>
+    <a class="nav-item" href="/categories">Categories.</a>
+  </nav>
+</div>
 
-  <div class="post">
-    <div class="post__title">
-      <h1>SQL injection - part two</h1>
-      <div class="sub-header">October 20, 2017</div>
-    </div>
-    <div class="post__body">
-      
+  <div class="page-wrapper">
+    <div class="post">
+      <div class="post__title">
+        <h1>SQL injection - part two</h1>
+        <div class="sub-header">October 20, 2017</div>
+      </div>
+      <div class="post__body">
+        
 
 <p>This is continuation of the series on SQL injection. In part one we covered what SQL injection is, some examples of what can happen when someone leaves their site open to SQLI, and a quick and dirty test to pick up some low hanging fruit.
 In this post we&rsquo;re going to go a bit further into how one would actually exploit a SQL vulnerability, how to figure out what type of database you&rsquo;re working with, and how to us the union operator to extract data, and walkthrough a practical example by testing out new found knowledge against an intentionally vulnerable app.</p>
@@ -97,7 +105,8 @@ In this post we&rsquo;re going to go a bit further into how one would actually e
 
 <p>Cool, we now have usernames and passwords for all the users of the web app. The passwords are hashed though so we cant read them. These passwords happen to hashed using the MD5 algorithm, which can be cracked reasonably easily. If you&rsquo;re interested you can crack them with a program called <code>john the ripper</code> but I won&rsquo;t cover that here.</p>
 
-    </div>
+      </div>
+    </div>    
   </div>
 </body>
 </html>

@@ -10,17 +10,18 @@
 <body>
   {{ partial "header.html" . }}
   <div class="page-wrapper">
-    {{ range .Data.Pages }}
-      {{ if eq .Type "post"}}
-        <div class="short-post">
-          <a class="short-post__title" href="{{ .Permalink }}">{{ .Title }}</a>
-          <div class="short-post__sub-title">{{ .Date.Format "January 2, 2006" }}</div>
-          <div class="short-post__body">
-            {{ .Description }} ...
-          </div>
-        </div>
+      {{ $data := .Data }}
+      {{ range $key,$value := .Data.Terms.ByCount }}
+        <li>
+          <a href="{{ (print $data.Plural "/" ($value.Name | urlize) "/") | relURL }}">
+            {{ $value.Name }}
+          </a>
+          <strong>
+            {{ $value.Count }}
+          </strong>
+        </li>
       {{ end }}
-    {{end}}
+
   </div>
 </body>
 </html>

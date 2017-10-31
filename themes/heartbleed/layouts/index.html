@@ -18,6 +18,9 @@
           <div class="short-post__body">
             {{ .Description }} ...
           </div>
+          {{ if .Params.tags }}
+            <div>Tags: {{ range .Params.tags }} <a href="/tags/{{ . | urlize }}">{{ . }}</a> {{ end }}</div>
+          {{ end }}
         </div>
       {{ end }}
     {{ end }}
